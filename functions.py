@@ -8,7 +8,6 @@ from selenium.common.exceptions import NoSuchElementException, ElementClickInter
     NoAlertPresentException, WebDriverException
 import traceback
 import time
-import re
 
 MAX_TRIES = 3
 id_tries = 0
@@ -279,8 +278,10 @@ def check_sum(ID):
         return False
 
 
-def fill_invoice(ID):
-    """Main Function. Fills invoice with provided info. Restarts the function (with same argument) if error occurs"""
+def fill_invoice(ID, is_test_user):
+    """Main Function. Fills invoice with provided info. Restarts the function (with same argument) if error occurs
+    if is_test_user, types test ID instead of real ID"""
+    # test ID 12345678910. This ID is for RS.ge in testing mode
     access_invoice_page()
 
     # if check_last_invoice(ID) is False: TODO: Doesn't work correctly, needs refining
@@ -291,7 +292,10 @@ def fill_invoice(ID):
         print_to_log(f"\t\t\tUploading ID: {ID}\n")
         btn_click("NEW_INVOICE_BTN")  # Open new Invoice
         select_month_in_list()
-        box_type("ID_INPUT", ID)
+        if is_test_user:
+            box_type("ID_INPUT", "12345678910")
+        else:
+            box_type("ID_INPUT", ID)
         # For actual usage, indicate ID variable as a value
         print_to_log(f"\tTyped ID: {ID}")
 
@@ -318,33 +322,33 @@ def fill_invoice(ID):
         else:
             message = "\t*** Sum was not right. Starting access&fill again"
             add_error(message)
-            fill_invoice(ID)
+            fill_invoice(ID, is_test_user)
 
 
     except NoSuchElementException:
         traceback.print_exc()
         message = f"ID: {ID} Couldn't find element during fill_invoice process"
         add_error(message)
-        fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
     except ElementClickInterceptedException:
         message = f"ID: {ID} Couldn't click element"
         add_error(message)
-        fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
     except NoAlertPresentException:
         message = f"ID: {ID} No alert is present to finish uploading invoice"
         add_error(message)
-        fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
     except ErrorBoxException:
         if find(*links["ERROR_BOX"]):
             btn_click("ERROR_BOX_QUIT")
         message = f"ID: {ID} Error Box appeared"
         add_error(message)
-        fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
     except:
         message = f"ID: {ID} Unknown error occurred during filling invoice"
         traceback.print_exc()
         add_error(message)
-        fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
     else:
         try:
             WebDriverWait(driver, 10).until(EC.alert_is_present())
@@ -354,7 +358,7 @@ def fill_invoice(ID):
         except:
             message = f"ID: {ID} \tCouldn't accept the upload alert"
             add_error(message)
-            fill_invoice(ID)
+            fill_invoice(ID, is_test_user)
         else:
             print_to_log(f"\t\t\tID {ID} uploaded successfully")
             print_to_log("\n------------------------------------------\n")

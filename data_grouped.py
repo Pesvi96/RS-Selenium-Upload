@@ -24,7 +24,6 @@ file_path = current_path + "/" + file_name
 workbook = xl.load_workbook(file_path)
 worksheet = workbook.active
 
-
 # Worksheet structure
 PRICE_COLUMN = 4
 ID_COLUMN = 1
@@ -38,7 +37,6 @@ ID_LIST = []
 PRICE_LIST = []
 PURPOSE_LIST = []
 VAT_LIST = []
-
 
 # Checks for all the values (Company ID, Price, Purpose, VAT (yes/no)) in the row.
 # If all values are present (there is no blank data),
@@ -54,7 +52,6 @@ for row in range(ROW_START, row_range):
         PURPOSE_LIST.append(str(purpose_value))
         VAT_LIST.append(str(vat_value))
 
-
 MY_DICT = {}
 
 # Append all values as a list of tuples under the corresponding (Company ID) key.
@@ -67,6 +64,3 @@ for i in range(len(ID_LIST)):
         pass
 
 workbook.close()
-
-
-

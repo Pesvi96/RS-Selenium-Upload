@@ -5,13 +5,12 @@ import time
 import ctypes
 
 is_test_user = True  # Change test_user into False if you want actual upload
-# test ID 12345678910. This ID is for RS.ge in testing mode
 
 
 def main():
     # Create logs.txt file (if already created, clears the file)
     with open("Logs/logs.txt", mode="w", encoding='utf-8') as file:
-        file.write(f"Here comes the sun <3\n\n Date: {date.today().strftime("%B %d, %Y")}\n")
+        file.write(f"Date: {date.today().strftime("%B %d, %Y")}\n")
 
     driver = init("https://www.rs.ge")
     if is_test_user:
@@ -21,10 +20,7 @@ def main():
     access_invoice_page()
     # Iterates through the data dictionary and uploads each company invoices to rs.ge
     for ID in MY_DICT:
-        if is_test_user:
-            fill_invoice("12345678910")
-        else:
-            fill_invoice(ID)
+        fill_invoice(ID, is_test_user)
 
     upload_to_csv("Dictionary: ", MY_DICT)
     print_to_log("\n\n\n\t\tCongrats! Upload complete!")
