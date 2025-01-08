@@ -26,8 +26,6 @@ def init(website):
     driver = webdriver.Chrome(options=options)
     driver.get(website)
     driver.implicitly_wait(10)
-    global month
-    month = get_month() - 1
     return driver
 
 
@@ -104,6 +102,12 @@ def get_month():
     month = int(time.strftime("%m", time.localtime()))
     print_to_log(f"Current month: {month}")
     return month
+
+def get_year():
+    """Returns current year as an integer"""
+    year = int(time.strftime("%Y", time.localtime()))
+    print(f"Current year: {year}")
+    return year
 
 
 # def check_url(actual):
@@ -211,16 +215,32 @@ def select_vat(vat):
 
 
 def select_month_in_list():
-    """Chooses previous month from the drop-down list
-    TODO: Needs reformatting in case it's January and you need to indicate last month (Dec of last year)"""
+    """Chooses previous month from the drop-down list.
+    If it's January, chooses December and indicates the previous year."""
     month_select = find(*links["MONTH_LIST"])
-    year_select = find(*links["YEAR_LIST"])
+    current_month = get_month()
+    if current_month == 1:
+        select_previous_year_in_list()
+        month_to_indicate = 12
+    else:
+        month_to_indicate = current_month
     while True:
         select = Select(month_select)
-        select.select_by_index(month)
+        select.select_by_index(month_to_indicate)
         month_select.get_attribute('value')
         time.sleep(0.5)
-        if int(month_select.get_attribute('value')) == month:
+        if int(month_select.get_attribute('value')) == month_to_indicate:
+            break
+
+
+def select_previous_year_in_list():
+    year_select = find(*links["YEAR_LIST"])
+    year = get_year() - 1
+    while True:
+        select = Select(year_select)
+        select.select_by_index(1)   # Chooses second option in Select
+        time.sleep(0.5)
+        if int(year_select.get_attribute('value')) == int(year):
             break
 
 
@@ -255,9 +275,10 @@ def check_company_name(ID):
             id_tries += 1
             fill_invoice(ID)
         elif id_tries == 2:
+            id_tries = 0
             message = f"ID not found in database. Shutting down program. \n\n ID was {ID}"
             add_error(message)
-            driver.quit()
+            return False
 
 
 def check_sum(ID):
@@ -299,7 +320,10 @@ def fill_invoice(ID, is_test_user):
         # For actual usage, indicate ID variable as a value
         print_to_log(f"\tTyped ID: {ID}")
 
-        check_company_name(ID)
+        if check_company_name(ID) == False:
+            print_to_log(f"\t\t**** Company ID Error: Couldn't find company with ID {ID}."
+                         f"Going for next one")
+            return
 
         values_list = []
 
