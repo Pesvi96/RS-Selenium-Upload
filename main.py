@@ -4,7 +4,7 @@ from data_grouped import MY_DICT, ID_LIST
 import time
 import ctypes
 
-is_test_user = True  # Change test_user into False if you want actual upload
+is_test_user = False  # Change test_user into False if you want actual upload
 
 
 def main():

@@ -152,6 +152,8 @@ def access_invoice_page():
         time.sleep(1)
         try:
             btn_click("POP_UP")
+            add_error("Tried to close pop-up")
+            time.sleep(1)
         except NoSuchElementException:
             message = "No popup"
             add_error(message)
@@ -223,7 +225,7 @@ def select_month_in_list():
         select_previous_year_in_list()
         month_to_indicate = 12
     else:
-        month_to_indicate = current_month
+        month_to_indicate = current_month - 1
     while True:
         select = Select(month_select)
         select.select_by_index(month_to_indicate)
@@ -234,13 +236,14 @@ def select_month_in_list():
 
 
 def select_previous_year_in_list():
+    """Chooses previous year form the drop-down list"""
     year_select = find(*links["YEAR_LIST"])
-    year = get_year() - 1
+    previous_year = get_year() - 1
     while True:
         select = Select(year_select)
         select.select_by_index(1)   # Chooses second option in Select
         time.sleep(0.5)
-        if int(year_select.get_attribute('value')) == int(year):
+        if int(year_select.get_attribute('value')) == int(previous_year):
             break
 
 
